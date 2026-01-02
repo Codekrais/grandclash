@@ -27,7 +27,8 @@ cancel_to_main = [
     back
 ]
 admin = [
-    [KeyboardButton(text="Отчет📝"),KeyboardButton(text="Рассылка🔃"),KeyboardButton(text="Получить базу данных🗃️")],
+    [KeyboardButton(text="Отчет по БД📝"),KeyboardButton(text="Рассылка🔃"),KeyboardButton(text="Получить БД🗃️")],
+    [KeyboardButton(text="RUNTIME бота⏰")],
     [KeyboardButton(text="Выйти из панели⛔")]
 ]
 

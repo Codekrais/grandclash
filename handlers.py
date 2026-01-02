@@ -18,6 +18,8 @@ load_dotenv()
 LOGIN = str(os.getenv("LOGIN"))
 PASSWORD = str(os.getenv("PASSWORD"))
 
+uptime = datetime.now()
+
 router = Router()
 
 class Reg(StatesGroup):
@@ -34,7 +36,7 @@ class Admin(StatesGroup):
 @router.message(Command('start'))
 async def hi(message: Message, state: FSMContext):
     await state.clear()
-    await make_note_into_db(f"@{message.from_user.username}", message.from_user.id)
+    await make_note_into_db(str(message.from_user.id),f"@{message.from_user.username}")
     await message.answer(f"""
 Этот бот создан для регистрации на участие в турнире по игре Clash Royale в Пивоваровской школе
 
@@ -67,14 +69,14 @@ async def reg(message: Message):
 @router.message(F.text.in_({"В главное меню❗","Выйти из панели⛔"}))
 async def reg(message: Message, state: FSMContext):
     await state.clear()
-    await make_note_into_db(f"@{message.from_user.username}", message.from_user.id)
+    await make_note_into_db(str(message.from_user.id), f"@{message.from_user.username}")
     await message.answer(f"""
 💾Вы перешли в главное меню! Выберите нужный пункт в меню снизу!
 """, reply_markup=kb.main_keyboard)
 
 @router.message(F.text.in_({"Посмотреть бланк регистрации📋","❌Не уверен"}))
 async def reg(message: Message):
-    blank = await get_reg_from_db(f"@{message.from_user.username}")
+    blank = await get_reg_from_db(str(message.from_user.id))
     await message.answer(f"""
 {blank}
 """, reply_markup=kb.blank_keyboard)
@@ -93,7 +95,7 @@ async def reg(message: Message):
 
 @router.message(F.text == "✅Уверен")
 async def reg(message: Message):
-    recv = await remove_blank_from_db(f"@{message.from_user.username}")
+    recv = await remove_blank_from_db(str(message.from_user.id))
     await message.answer(f"""
 {recv}
 """, reply_markup=kb.blank_keyboard)
@@ -160,8 +162,7 @@ async def last(message: Message, state: FSMContext):
     if fullmatch(r'^\w+(?:\s*\([^)]*\))?(?:,\s*\w+(?:\s*\([^)]*\))?){7}$', message.text):
         await state.update_data(coloda=message.text)
         blank = await state.get_data()
-        tgid = f"@{message.from_user.username}"
-        await send_reg_into_db(blank, tgid)
+        await send_reg_into_db(blank, str(message.from_user.id))
         await message.answer(f"""✅Вы успешно закончили регистрацию!""",reply_markup=kb.main_keyboard)
         await state.clear()
     else: await message.answer(f"""⛔Вы ввели некорректную колоду! Введите корректную (она должна состоять из 8 карт, около некотрых в скобках нужно укзаать эво/герой/чемпион.
@@ -190,7 +191,7 @@ async def admin_login(message: Message, state: FSMContext):
         await state.set_state(Admin.isAdmin)
         await message.answer(f"""👨‍💻Вы успешно авторизовались в админ-панель""",reply_markup=kb.admin_main_keyboard)
 
-@router.message(Admin.isAdmin, F.text == "Отчет📝")
+@router.message(Admin.isAdmin, F.text == "Отчет по БД📝")
 async def adm(message: Message, state: FSMContext):
     report = await get_report_from_db()
     await message.answer(report, reply_markup=kb.admin_main_keyboard)
@@ -211,11 +212,16 @@ async def adm(message: Message, state: FSMContext, bot: Bot):
     await message.answer(f'''✅Рассылка завершена
 Cообщение было отправлено {count} пользователям''', reply_markup=kb.admin_main_keyboard)
 
-@router.message(Admin.isAdmin, F.text == "Получить базу данных🗃️")
+@router.message(Admin.isAdmin, F.text == "Получить БД🗃️")
 async def adm(message: Message, state: FSMContext, bot: Bot):
     recv = await get_db_for_admin()
     if recv:
-        await message.answer_document(FSInputFile("db.txt"),caption="🗃️Сформированная база данных")
+        await message.answer_document(FSInputFile("db.txt"),caption="🗃️Сформированная БД")
+
+@router.message(Admin.isAdmin, F.text == "RUNTIME бота⏰")
+async def adm(message: Message, state: FSMContext, bot: Bot):
+    runtime = datetime.now() - uptime
+    await message.answer(f"""⏰С момента запуска бота прошло {runtime.days} дней, {runtime.seconds // 3600} часов, {(runtime.seconds % 3600) // 60} минут, {runtime.seconds} секунд""", reply_markup=kb.admin_main_keyboard)
 
 
 @router.message(Admin.isAdmin and Admin.mail, F.text == "В главное меню панели❗")
