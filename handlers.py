@@ -221,7 +221,7 @@ async def adm(message: Message, state: FSMContext, bot: Bot):
 @router.message(Admin.isAdmin, F.text == "RUNTIME бота⏰")
 async def adm(message: Message, state: FSMContext, bot: Bot):
     runtime = datetime.now() - uptime
-    await message.answer(f"""⏰С момента запуска бота прошло {runtime.days} дней, {runtime.seconds // 3600} часов, {(runtime.seconds % 3600) // 60} минут, {runtime.seconds} секунд""", reply_markup=kb.admin_main_keyboard)
+    await message.answer(f"""⏰С момента запуска бота прошло {runtime.days} дней, {runtime.seconds // 3600} часов, {(runtime.seconds % 3600) // 60} минут, {runtime.seconds % 60} секунд""", reply_markup=kb.admin_main_keyboard)
 
 
 @router.message(Admin.isAdmin and Admin.mail, F.text == "В главное меню панели❗")
