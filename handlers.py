@@ -106,6 +106,13 @@ async def reg(message: Message):
 ВПН за 99р: @vpn_by_cbk
 """, reply_markup=kb.main_keyboard)
 
+@router.message(F.text == "Техподдержка🔧")
+async def reg(message: Message):
+    await message.answer(f"""
+Вопросы по турниру: @curs3dik
+Вопросы по боту и техчасти: @endurra
+""", reply_markup=kb.main_keyboard)
+
 
 #########################################################################################################################################
 """Конец меню регистрации, начало бланка регистрации
@@ -159,7 +166,7 @@ async def coloda(message: Message, state: FSMContext):
 
 @router.message(Reg.coloda)
 async def last(message: Message, state: FSMContext):
-    if fullmatch(r'^\w+(?:\s*\([^)]*\))?(?:,\s*\w+(?:\s*\([^)]*\))?){7}$', message.text):
+    if fullmatch(r'^(?:[^,()]+(?:\s+[^,()]+)*)(?:\s*\([^)]*\))?(?:,\s*(?:[^,()]+(?:\s+[^,()]+)*)(?:\s*\([^)]*\))?){7}$', message.text):
         await state.update_data(coloda=message.text)
         blank = await state.get_data()
         await send_reg_into_db(blank, str(message.from_user.id))
@@ -184,8 +191,12 @@ async def last(message: Message, state: FSMContext):
 """
 @router.message(Command('login_in_admin_panel'))
 async def admin_login(message: Message, state: FSMContext):
-    login = message.text.split()[1]
-    password = message.text.split()[2]
+    try:
+        login = message.text.split()[1]
+        password = message.text.split()[2]
+    except IndexError:
+        login = None
+        password = None
     if login == LOGIN and password == PASSWORD:
         await state.clear()
         await state.set_state(Admin.isAdmin)

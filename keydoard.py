@@ -3,7 +3,7 @@ back = [KeyboardButton(text="В главное меню❗")]
 admin_back = [KeyboardButton(text="В главное меню панели❗")]
 
 main = [
-    [KeyboardButton(text="Регистрация🔗")],
+    [KeyboardButton(text="Регистрация🔗"),KeyboardButton(text="Техподдержка🔧")],
     [KeyboardButton(text="VPN за 99р🔥")]
 ]
 
