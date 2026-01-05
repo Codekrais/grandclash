@@ -216,12 +216,16 @@ async def adm(message: Message, state: FSMContext, bot: Bot):
 async def adm(message: Message, state: FSMContext, bot: Bot):
     mailing_list = await get_mailing_list_from_db()
     count = 0
+    err = 0
     for id in mailing_list:
-        await bot.send_message(chat_id=id, text=message.text)
-        count += 1
+        try:
+            await bot.send_message(chat_id=id, text=message.text)
+            count += 1
+        except:
+            err += 1
     await state.set_state(Admin.isAdmin)
     await message.answer(f'''✅Рассылка завершена
-Cообщение было отправлено {count} пользователям''', reply_markup=kb.admin_main_keyboard)
+Cообщение было отправлено {count} пользователям, {err} пользователей сообщение не получили''', reply_markup=kb.admin_main_keyboard)
 
 @router.message(Admin.isAdmin, F.text == "Получить БД🗃️")
 async def adm(message: Message, state: FSMContext, bot: Bot):

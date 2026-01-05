@@ -1,6 +1,6 @@
 from datetime import datetime
 from functools import wraps
-close_reg = datetime(2026, 1, 15,3,0,0)
+close_reg = datetime(2026, 1, 15,0,0,0)
 """Декораторы для функций"""
 
 def error_handler(func): #Обработчик ошибок
