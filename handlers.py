@@ -100,10 +100,10 @@ async def reg(message: Message):
 {recv}
 """, reply_markup=kb.blank_keyboard)
 
-@router.message(F.text == "VPN за 99р🔥")
+@router.message(F.text == "Обход Рунета🥷")
 async def reg(message: Message):
     await message.answer(f"""
-ВПН за 99р: @vpn_by_cbk
+Обход Рунета🥷: @wlbypass_bot
 """, reply_markup=kb.main_keyboard)
 
 @router.message(F.text == "Техподдержка🔧")
