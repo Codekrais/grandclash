@@ -1,2 +1,5 @@
 aiogram
 dotenv
+openpyxl
+pillow
+qrcode

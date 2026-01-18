@@ -12,7 +12,7 @@ from aiogram.types import FSInputFile
 from dotenv import load_dotenv
 
 from decorators import *
-from keydoard import cancel_to_main, cancel_to_main_keyboard
+from keydoard import cancel_to_main, cancel_to_main_keyboard, start_reg_keyboard
 
 load_dotenv()
 LOGIN = str(os.getenv("LOGIN"))
@@ -77,9 +77,9 @@ async def reg(message: Message, state: FSMContext):
 @router.message(F.text.in_({"Посмотреть бланк регистрации📋","❌Не уверен"}))
 async def reg(message: Message):
     blank = await get_reg_from_db(str(message.from_user.id))
-    await message.answer(f"""
-{blank}
-""", reply_markup=kb.blank_keyboard)
+    if blank:
+        await message.answer(f"""{blank}""", reply_markup=kb.blank_keyboard)
+    else: await message.answer(f"""⛔Вы не зарегистрированы""", reply_markup=start_reg_keyboard)
 
 @router.message(F.text.in_({"Сколько осталось до конца регистрации⁉️"}))
 @date
@@ -98,7 +98,7 @@ async def reg(message: Message):
     recv = await remove_blank_from_db(str(message.from_user.id))
     await message.answer(f"""
 {recv}
-""", reply_markup=kb.blank_keyboard)
+""", reply_markup=start_reg_keyboard)
 
 @router.message(F.text == "Обход Рунета🥷")
 async def reg(message: Message):
@@ -237,6 +237,12 @@ async def adm(message: Message, state: FSMContext, bot: Bot):
 async def adm(message: Message, state: FSMContext, bot: Bot):
     runtime = datetime.now() - uptime
     await message.answer(f"""⏰С момента запуска бота прошло {runtime.days} дней, {runtime.seconds // 3600} часов, {(runtime.seconds % 3600) // 60} минут, {runtime.seconds % 60} секунд""", reply_markup=kb.admin_main_keyboard)
+
+@router.message(Admin.isAdmin, F.text == "Excel отчет📗")
+async def adm(message: Message, state: FSMContext, bot: Bot):
+    recv = await get_excel_from_db()
+    if recv:
+        await message.answer_document(FSInputFile("db.xlsx"),caption="📗Exel отчет")
 
 
 @router.message(Admin.isAdmin and Admin.mail, F.text == "В главное меню панели❗")
