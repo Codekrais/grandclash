@@ -121,7 +121,7 @@ async def reg(message: Message):
 |
 """
 @router.message(F.text.in_({"Начать регистрацию✅", "Изменить регистрацию♻️"}))
-@date
+#@date
 async def clash_id(message: Message, state: FSMContext):
     await state.set_state(Reg.name)
     await message.answer(f"""1️⃣ Введите ваше имя и фамилию""", reply_markup=cancel_to_main_keyboard)
