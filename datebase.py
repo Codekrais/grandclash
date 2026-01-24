@@ -1,13 +1,13 @@
 import json
 import asyncio
 
-import qrcode
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from qrcode import *
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 from decorators import close_reg
+
 async def make_note_into_db(chatid: str, tgid: str):
     with open('db.json', encoding='UTF-8') as f:
         data = json.load(f)
@@ -81,7 +81,7 @@ async def get_qr_code_from_db(chatid: str):
         if blank:
             qr = QRCode(
                 version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                error_correction=constants.ERROR_CORRECT_L,
                 box_size=23,
                 border=1,
             )
@@ -98,8 +98,8 @@ async def get_qr_code_from_db(chatid: str):
             # font = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
             # draw.text((2050,332-20),date,(52,61,135), font=ImageFont.truetype("DejaVuSans-Bold.ttf", size=60))
             # img.paste(qr_img,(x,y))
-            return qr_img.tobytes()
-    return f"""⛔Вы не зарегистрированы"""
+            return qr_img
+    return False
 #########################################################################################################################################
 """
 Для админки

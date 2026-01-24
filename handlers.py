@@ -1,6 +1,6 @@
 import os
 from aiogram import F, Router
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, ReplyKeyboardRemove, InlineKeyboardMarkup
 from aiogram.filters import Command
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
@@ -8,8 +8,9 @@ from aiogram import Bot
 import keydoard as kb
 from datebase import *
 from re import fullmatch
-from aiogram.types import FSInputFile
+from aiogram.types import FSInputFile, BufferedInputFile
 from dotenv import load_dotenv
+from io import BytesIO
 
 from decorators import *
 from keydoard import cancel_to_main, cancel_to_main_keyboard, start_reg_keyboard
@@ -77,8 +78,13 @@ async def reg(message: Message, state: FSMContext):
 @router.message(F.text.in_({"Посмотреть бланк регистрации📋","❌Не уверен"}))
 async def reg(message: Message):
     blank = await get_reg_from_db(str(message.from_user.id))
-    if blank:
-        await message.answer(f"""{blank}""", reply_markup=kb.blank_keyboard)
+    qr = await get_qr_code_from_db(str(message.from_user.id))
+    if blank and qr:
+        buffer = BytesIO()
+        qr.save(buffer, format="PNG")
+        buffer.seek(0)
+        qrcode = BufferedInputFile(file=buffer.getvalue(),filename="qrcode.png")
+        await message.answer_photo(caption=f"""{blank}""", reply_markup=kb.blank_keyboard, photo=qrcode)
     else: await message.answer(f"""⛔Вы не зарегистрированы""", reply_markup=start_reg_keyboard)
 
 @router.message(F.text.in_({"Сколько осталось до конца регистрации⁉️"}))
